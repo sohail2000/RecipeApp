@@ -11,7 +11,7 @@ const recipeSchema = new Schema({
         type: String,
         reqiured: true
     },
-    recipe:{
+    steps:{
         type: String,
         required:true
     }

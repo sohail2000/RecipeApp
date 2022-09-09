@@ -16,7 +16,7 @@ const getRecipe = async (req, res) => {
         return res.status(404).json({error: 'No such recipe'})
     }
 
-    recipe = await Recipe.findById(id)
+    const recipe = await Recipe.findById(id)
 
     if(!recipe){
         return res.status(400).json({error: 'No such recipe'})
@@ -27,7 +27,7 @@ const getRecipe = async (req, res) => {
 
 // create a new recipe
 const createRecipe = async(req, res) =>{
-    const { title, ingredients, recipe } = req.body
+    const { title, ingredients, steps } = req.body
 
     let emptyFields = []
     if (!title) {
@@ -36,8 +36,8 @@ const createRecipe = async(req, res) =>{
     if (!ingredients) {
         emptyFields.push('ingredients')
     }
-    if (!recipe) {
-        emptyFields.push('recipe')
+    if (!steps) {
+        emptyFields.push('steps')
     }
     if (emptyFields.length > 0) {
         return res.status(400).json({ error: 'Please fill in all fields', emptyFields })
@@ -46,7 +46,7 @@ const createRecipe = async(req, res) =>{
 
     //add doc to db
     try {
-        const recipe = await Recipe.create({ title, ingredients, recipe })
+        const recipe = await Recipe.create({ title, ingredients, steps })
         res.status(200).json(recipe)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -87,7 +87,33 @@ const updateRecipe = async (req, res) => {
         return res.status(400).json({ error: 'No such recipe' })
     }
 
-    res.status(200).json(Recipe)
+    res.status(200).json(recipe)
+}
+
+const searchByName = async (req, res) => {
+    var regex = new RegExp(req.params.title,'i');
+
+    const recipe = await Recipe.find({title:regex})
+
+    if (!recipe) {
+        return res.status(400).json({ error: 'No such recipe' })
+    }
+
+    res.status(200).json(recipe)
+
+}
+
+const searchByIngredients = async (req, res) => {
+    var regex = new RegExp(req.params.ingredients,'i');
+
+    const recipe = await Recipe.find({ingredients:regex})
+
+    if (!recipe) {
+        return res.status(400).json({ error: 'No such recipe' })
+    }
+
+    res.status(200).json(recipe)
+
 }
 
 module.exports = {
@@ -95,5 +121,7 @@ module.exports = {
     getRecipes,
     getRecipe,
     deleteRecipe,
-    updateRecipe
+    updateRecipe,
+    searchByName,
+    searchByIngredients
 }
